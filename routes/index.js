@@ -9,9 +9,8 @@ router.get('/', function(req, res, next) {
     res.render('index', { title: 'Soft Colors' });
 });
 
-router.post('/getColorNames', async function(req, res, next) {
-    const response = await fetch(`https://api.color.pizza/v1/?values=${req.body.colors.join(',')}`).then(response => response.json());
-
+router.get('/getColorNames', async function(req, res, next) {
+    const response = await fetch(`https://api.color.pizza/v1/?values=${req.query.colors}`).then(response => response.json());
     res.json(response.colors);
 });
 

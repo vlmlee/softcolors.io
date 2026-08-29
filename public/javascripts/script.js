@@ -1,25 +1,31 @@
 var defaultColors = [
-    {'hex': '#E53935', 'name': 'Cadmium Red'},
-    {'hex': '#3f51b5', 'name': 'Ultramarine Blue'},
-    {'hex': '#8bc34a', 'name': 'Sap Green'},
-    {'hex': '#ffee58', 'name': 'Lemon Yellow'},
-    {'hex': '#e67e22', 'name': 'Burnt Sienna'},
-    {'hex': '#b71c1c', 'name': 'Alizarin Crimson'},
-    {'hex': '#01579b', 'name': 'Phthalo Blue'},
-    {'hex': '#00897b', 'name': 'Viridian'},
-    {'hex': '#ffb74d', 'name': 'Yellow Ochre'},
-    {'hex': '#37474f', 'name': 'Paynes Gray'}
+    { 'hex': '#E53935', 'name': 'Cadmium Red' },
+    { 'hex': '#3f51b5', 'name': 'Ultramarine Blue' },
+    { 'hex': '#8bc34a', 'name': 'Sap Green' },
+    { 'hex': '#ffee58', 'name': 'Lemon Yellow' },
+    { 'hex': '#e67e22', 'name': 'Burnt Sienna' },
+    { 'hex': '#b71c1c', 'name': 'Alizarin Crimson' },
+    { 'hex': '#01579b', 'name': 'Phthalo Blue' },
+    { 'hex': '#00897b', 'name': 'Viridian' },
+    { 'hex': '#ffb74d', 'name': 'Yellow Ochre' },
+    { 'hex': '#37474f', 'name': 'Paynes Gray' }
 ];
 
+var finishedLoading = false;
+
 var handlers = {
-    getColorNames: async function(colors) {
-        var colorNames = await $.ajax({
+    getColorNames: async function (colors) {
+        // Route already returns the colors array via res.json(response.colors)
+        return await $.ajax({
             url: '/getColorNames',
-            type: 'POST',
-            data: { colors: colors.map(color => color.hex.slice(1)) },
-            dataType: 'json'
+            data: {
+                colors: colors.map(function (color) {
+                    return (color.hex || color).replace(/^#/, '');
+                }).join(',')
+            },
+            dataType: 'json',
+            cache: false
         });
-        return colorNames;
     }
 }
 
@@ -35,7 +41,7 @@ function washOut($els, duration, stagger, complete) {
         return;
     }
 
-    $visible.each(function(index) {
+    $visible.each(function (index) {
         var $el = $(this);
         $el
             .stop(true, false)
@@ -44,14 +50,14 @@ function washOut($els, duration, stagger, complete) {
             .animate({ opacity: 0 }, {
                 duration: duration,
                 easing: 'swing',
-                step: function(now) {
+                step: function (now) {
                     var progress = 1 - now;
                     $el.css({
                         filter: 'blur(' + (progress * 5) + 'px) saturate(' + (1 - progress * 0.85) + ') brightness(' + (1 + progress * 0.45) + ')',
                         transform: 'scale(' + (1 + progress * 0.01) + ')'
                     });
                 },
-                complete: function() {
+                complete: function () {
                     $el.hide().css({
                         opacity: '',
                         filter: '',
@@ -75,7 +81,7 @@ function washIn($els, duration, stagger, complete) {
         return;
     }
 
-    $els.each(function(index) {
+    $els.each(function (index) {
         var $el = $(this);
         $el
             .stop(true, false)
@@ -90,14 +96,14 @@ function washIn($els, duration, stagger, complete) {
             .animate({ opacity: 1 }, {
                 duration: duration,
                 easing: 'swing',
-                step: function(now) {
+                step: function (now) {
                     var progress = 1 - now;
                     $el.css({
                         filter: 'blur(' + (progress * 5) + 'px) saturate(' + (1 - progress * 0.85) + ') brightness(' + (1 + progress * 0.45) + ')',
                         transform: 'scale(' + (1 + progress * 0.01) + ')'
                     });
                 },
-                complete: function() {
+                complete: function () {
                     $el.css({
                         opacity: '',
                         filter: '',
@@ -113,7 +119,7 @@ function washIn($els, duration, stagger, complete) {
 
 function showColorPicker() {
     // Brush rinses first, then the palette washes away
-    washOut($('.paintbrush-image-container, .paintbrush-palette'), 350, 50, function() {
+    washOut($('.paintbrush-image-container, .paintbrush-palette'), 350, 50, function () {
         $('.color-picker').fadeIn(200);
         $('.show-color-picker-button').hide();
         $('.show-brush-and-palette-button').show();
@@ -128,23 +134,52 @@ function showBrushAndPalette() {
     washIn($('.paintbrush-palette, .paintbrush-image-container'), 320, 50);
 }
 
-async function setDefaultColors() {
-    // var colorNames = await handlers.getColorNames(defaultColors);
-
-    for (var i = 0; i < defaultColors.length; i++) {
-        $('.color-box').eq(i).css('background-color', defaultColors[i].hex);
-        $('.color-box__modified').eq(i).css('background-color', modifyColorToPastelSoft(defaultColors[i].hex));
-        var colorName = defaultColors[i].name + ' → ' + defaultColors[i].name;
-        $('.color-name').eq(i).text(colorName).attr('title', colorName);
-        $('.color-code').eq(i).text(defaultColors[i].hex.toUpperCase() + ' → ' + modifyColorToPastelSoft(defaultColors[i].hex).toUpperCase());
-        $('#pigment-' + (i + 1) + ' stop').attr('stop-color', defaultColors[i].hex);
-    }
-
-    var queryParams = {};
-    for (var i = 0; i < defaultColors.length; i++) {
-        queryParams["color" + (i + 1)] = defaultColors[i].hex.slice(1);
-    }
+function setQueryParams(colors) {
+    var queryParams = {
+        colors: encodeURIComponent(colors.map(color => color.hex.slice(1)).join(','))
+    };
     window.history.pushState({}, '', '?' + $.param(queryParams));
+}
+
+async function setColorPalette() {
+    const colorsFromQueryParams = await getColorsFromQueryParams();
+
+    for (var i = 0; i < colorsFromQueryParams.length; i++) {
+        $('#pigment-' + (i + 1) + ' stop').attr('stop-color', colorsFromQueryParams[i].hex);
+    }
+
+    var softColors = colorsFromQueryParams.map(color => modifyColorToPastelSoft(color.hex));
+    var colors = await handlers.getColorNames(softColors);
+
+    for (var i = 0; i < colorsFromQueryParams.length; i++) {
+        $('.color-box').eq(i).css('background-color', colorsFromQueryParams[i].hex);
+        $('.color-box__modified').eq(i).css('background-color', colors[i].hex);
+        var colorName = colorsFromQueryParams[i].name + ' → ' + colors[i].name;
+        $('.color-name').eq(i).text(colorName).attr('title', colorName);
+        $('.color-code').eq(i).text(colorsFromQueryParams[i].hex.toUpperCase() + ' → ' + colors[i].hex.toUpperCase());
+    }
+}
+
+async function getColorsFromQueryParams() {
+    var queryParams = window.location.search.substring(1);
+    if (queryParams === '') {
+        return defaultColors;
+    }
+    var queryParamColors = decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",");
+    var colors = await handlers.getColorNames(queryParamColors);
+
+    finishedLoading = true;
+
+    return colors.map(color => {
+        return {
+            hex: color.hex,
+            name: color.name
+        }
+    });
+}
+
+function resetColors() {
+    setQueryParams(defaultColors);
 }
 
 function convertHexToHSL(hex) {
@@ -184,7 +219,7 @@ function convertHSLToHex(h, s, l) {
     if (s === 0) {
         r = g = b = l;
     } else {
-        var hue2rgb = function(p, q, t) {
+        var hue2rgb = function (p, q, t) {
             if (t < 0) t += 1;
             if (t > 1) t -= 1;
             if (t < 1 / 6) return p + (q - p) * 6 * t;
@@ -227,7 +262,7 @@ function pPiling() {
         easing: 'easeInCubic'
     });
 
-    $('#about').click(function() {
+    $('#about').click(function () {
         $.fn.pagepiling.moveSectionDown();
     });
     // ----------------------------------------------------------
@@ -235,7 +270,7 @@ function pPiling() {
 
 // jQUery plugin to convert rgb values into hex
 $.cssHooks.backgroundColor = {
-    get: function(elem) {
+    get: function (elem) {
         if (elem.currentStyle)
             var bg = elem.currentStyle["backgroundColor"];
         else if (window.getComputedStyle)
@@ -257,12 +292,12 @@ $.cssHooks.backgroundColor = {
 function delegation() {
     // Event delegations ----------------------------------------
     // This is to make sure AJAX DOM elements are properly handled.
-    $('.content').on('click', '.submit', function(e) {
+    $('.content').on('click', '.submit', function (e) {
         e.preventDefault();
         handlers['convertColor'].call(this, e);
-    }).on('click', '.clear', function() {
+    }).on('click', '.clear', function () {
         $("input").val('');
-    }).on('mouseenter', '.color-box', function() {
+    }).on('mouseenter', '.color-box', function () {
         var colorCode = $(this).css("backgroundColor");
         $(this).append("<p class='color-code'>" + colorCode + "<a class='popup-with-zoom-anim' href='#copied'><img class='save' src='../images/clipboard.svg' /></a></p>");
 
@@ -282,14 +317,14 @@ function delegation() {
             mainClass: 'my-mfp-zoom-in'
         });
 
-    }).on('click', '.save', function() {
+    }).on('click', '.save', function () {
         var tempValue = $('<input>');
         var colorCode = $('.color-code').text();
         $('.content').append(tempValue);
         tempValue.val(colorCode).select();
         document.execCommand("copy");
         tempValue.remove();
-    }).on('mouseleave', '.color-box', function() {
+    }).on('mouseleave', '.color-box', function () {
         $(this).children().remove();
     });
     //-----------------------------------------------------------
@@ -300,7 +335,7 @@ function genericClickHandler() {
     // click handler for all buttons and links using the data-action 
     // attribute. Here, we map the data-action attribute's value to 
     // its respective handler function.
-    $("button[data-action]").on("click", function(e) {
+    $("button[data-action]").on("click", function (e) {
         e.preventDefault();
         var link = $(this),
             action = link.data("action");
@@ -311,9 +346,28 @@ function genericClickHandler() {
     });
 }
 
-$(document).ready(function() {
-    showBrushAndPalette();
-    setDefaultColors();
+$(document).ready(function () {
+    setColorPalette();
+    const elementsToHide = [
+        '.color-picker',
+        '.show-color-picker-button',
+        '.show-brush-and-palette-button',
+        '.waterdrop-button',
+        '.three-droplets-button',
+        '.reset-button',
+        '.paintbrush-palette',
+        '.paintbrush-image-container'
+    ];
+    $(elementsToHide.join(', ')).hide();
+
+    const interval = setInterval(() => {
+        if (finishedLoading) {
+            clearInterval(interval);
+            $(elementsToHide.join(', ')).show();
+            showBrushAndPalette();
+        }
+    }, 1000);
+
     pPiling();
     delegation();
     genericClickHandler();
