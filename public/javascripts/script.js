@@ -15,12 +15,11 @@ var finishedLoading = false;
 
 var handlers = {
     getColorNames: async function (colors) {
-        // Route already returns the colors array via res.json(response.colors)
         return await $.ajax({
             url: '/getColorNames',
             data: {
                 colors: colors.map(function (color) {
-                    return (color.hex || color).replace(/^#/, '');
+                    return color.replace(/^#/, '');
                 }).join(',')
             },
             dataType: 'json',
@@ -158,6 +157,8 @@ async function setColorPalette() {
         $('.color-name').eq(i).text(colorName).attr('title', colorName);
         $('.color-code').eq(i).text(colorsFromQueryParams[i].hex.toUpperCase() + ' → ' + colors[i].hex.toUpperCase());
     }
+
+    setQueryParams(colorsFromQueryParams);
 }
 
 async function getColorsFromQueryParams() {
@@ -168,7 +169,7 @@ async function getColorsFromQueryParams() {
         return defaultColors;
     }
     var queryParamColors = decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",");
-    var colors = await handlers.getColorNames(queryParamColors);
+    var colors = await handlers.getColorNames(queryParamColors.map(color => '#' + color));
 
     finishedLoading = true;
 
@@ -182,6 +183,7 @@ async function getColorsFromQueryParams() {
 
 function resetColors() {
     setQueryParams(defaultColors);
+    setColorPalette();
 }
 
 function convertHexToHSL(hex) {
