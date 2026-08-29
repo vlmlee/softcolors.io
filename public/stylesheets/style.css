@@ -226,7 +226,7 @@ html {
   top: 52.6%;
 }
 
-.show-color-picker-button, .show-brush-and-palette-button {
+.show-color-picker-button, .show-brush-and-palette-button, .waterdrop-button, .three-droplets-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -241,26 +241,27 @@ html {
   transition: transform 0.2s ease,
     background-color 0.2s ease,
     color 0.2s ease;
-  margin-top: 15px;
 }
 
-.show-color-picker-button:hover, .show-brush-and-palette-button:hover {
+.show-color-picker-button:hover, .show-brush-and-palette-button:hover, .waterdrop-button:hover, .three-droplets-button:hover {
   transform: scale(1.05);
   background: #111;
   color: #fff;
 }
 
-.show-color-picker-button:active, .show-brush-and-palette-button:active {
+.show-color-picker-button:active, .show-brush-and-palette-button:active, .waterdrop-button:active, .three-droplets-button:active {
   transform: scale(0.97);
 }
 
-.show-color-picker-button:focus-visible, .show-brush-and-palette-button:focus-visible {
+.show-color-picker-button:focus-visible, .show-brush-and-palette-button:focus-visible, .waterdrop-button:focus-visible, .three-droplets-button:focus-visible {
   outline: 2px solid #111;
   outline-offset: 3px;
 }
 
 .dropper-icon,
-.brush-icon {
+.brush-icon,
+.waterdrop-icon,
+.three-droplets-icon {
   display: block;
   pointer-events: none;
 }
@@ -347,6 +348,10 @@ html {
   left: 0;
   right: 0;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
 /*-------------------*        #FONTS

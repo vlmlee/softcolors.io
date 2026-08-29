@@ -12,64 +12,14 @@ var defaultColors = [
 ];
 
 var handlers = {
-    convert: function(e) {
-        e.preventDefault();
-
-        setTimeout(function() {
-            $.get('/convert', function(form) {
-                $('.content').html(form).hide().fadeIn(300);
-            }, 'html');
-        }, animationTiming($('.color-box')));
-    },
-
-    convertColor: function(e) {
-        e.preventDefault();
-        $.post('/convertColor', $('#inputColorForm').serialize(), function(color) {
-            // use $("[name='rgb']").attr('value', color.convertedRGBColor); for hex -> rbg conversion
-            // use $("[name='hex']").attr('value', color.convertedHexColor); for rbg -> hex conversion
-            $("input[name='rgb']").val(color.rgb);
-            $("input[name='hex']").val(color.hex);
-            $("input[name='soft-rgb']").val(color.softRgb);
-            $("input[name='soft-hex']").val(color.softHex);
-
-            // Change colors of colorboxes
-            $('.convert-color-box').css({ "background-color": color.hex });
-            $('.convert-soft-color-box').css({ "background-color": color.softHex });
-        }, 'json');
-    },
-
-    choose: function(e) {
-        e.preventDefault();
-
-        setTimeout(function() {
-            $.get('/choose', function(colors) {
-                handlers.chooseColor(colors);
-            }, 'json');
-        }, animationTiming($('.color-box')));
-    },
-
-    chooseColor: function(colors) {
-        $.get('/chooseColor', function(colorBoxes) {
-            var colorBoxes = $(colorBoxes);
-            $('.content').html(colorBoxes);
-        }, 'html');
-    },
-
-    random: function(e) {
-        e.preventDefault();
-
-        setTimeout(function() {
-            $.get('/random', function(randomColors) {
-                handlers.chooseRandomColor(randomColors);
-            }, 'json');
-        }, animationTiming($('.color-box')));
-    },
-
-    chooseRandomColor: function(randomColors) {
-        $.get('/chooseColor', function(colorBoxes) {
-            var colorBoxes = $(colorBoxes);
-            $('.content').html(colorBoxes);
-        }, 'html');
+    getColorNames: async function(colors) {
+        var colorNames = await $.ajax({
+            url: '/getColorNames',
+            type: 'POST',
+            data: { colors: colors.map(color => color.hex.slice(1)) },
+            dataType: 'json'
+        });
+        return colorNames;
     }
 }
 
@@ -165,26 +115,28 @@ function showColorPicker() {
     // Brush rinses first, then the palette washes away
     washOut($('.paintbrush-image-container, .paintbrush-palette'), 350, 50, function() {
         $('.color-picker').fadeIn(200);
-        $('.show-color-picker-button').hide();
+        $('.show-color-picker-button, .waterdrop-button, .three-droplets-button').hide();
         $('.show-brush-and-palette-button').show();
     });
 }
 
 function showBrushAndPalette() {
     $('.color-picker').hide();
-    $('.show-color-picker-button').show();
+    $('.show-color-picker-button, .waterdrop-button, .three-droplets-button').show();
     $('.show-brush-and-palette-button').hide();
     // Palette settles first, then brush reappears into it
     washIn($('.paintbrush-palette, .paintbrush-image-container'), 320, 50);
 }
 
-function setDefaultColors() {
+async function setDefaultColors() {
+    // var colorNames = await handlers.getColorNames(defaultColors);
+
     for (var i = 0; i < defaultColors.length; i++) {
         $('.color-box').eq(i).css('background-color', defaultColors[i].hex);
         $('.color-box__modified').eq(i).css('background-color', modifyColorToPastelSoft(defaultColors[i].hex));
         var colorName = defaultColors[i].name + ' → ' + defaultColors[i].name;
         $('.color-name').eq(i).text(colorName).attr('title', colorName);
-        $('.color-code').eq(i).text(defaultColors[i].hex.toUpperCase() + ' → ' + defaultColors[i].hex.toUpperCase());
+        $('.color-code').eq(i).text(defaultColors[i].hex.toUpperCase() + ' → ' + modifyColorToPastelSoft(defaultColors[i].hex).toUpperCase());
         $('#pigment-' + (i + 1) + ' stop').attr('stop-color', defaultColors[i].hex);
     }
 

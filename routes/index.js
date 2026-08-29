@@ -9,11 +9,10 @@ router.get('/', function(req, res, next) {
     res.render('index', { title: 'SoftColors' });
 });
 
-router.get('/name/:color', async function(req, res, next) {
-    const response = await fetch(`https://api.color.pizza/v1/?values=${req.params.color}`).then(response => response.json());
-    res.json({
-        name: response.paletteTitle
-    });
+router.post('/getColorNames', async function(req, res, next) {
+    const response = await fetch(`https://api.color.pizza/v1/?values=${req.body.colors.join(',')}`).then(response => response.json());
+
+    res.json(response.colors);
 });
 
 router.post('/convertColor', function(req, res, next) {
