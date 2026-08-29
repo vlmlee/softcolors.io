@@ -185,6 +185,7 @@ function setDefaultColors() {
         var colorName = defaultColors[i].name + ' → ' + defaultColors[i].name;
         $('.color-name').eq(i).text(colorName).attr('title', colorName);
         $('.color-code').eq(i).text(defaultColors[i].hex.toUpperCase() + ' → ' + defaultColors[i].hex.toUpperCase());
+        $('#pigment-' + (i + 1) + ' stop').attr('stop-color', defaultColors[i].hex);
     }
 
     var queryParams = {};
