@@ -6,7 +6,7 @@ const express = require('express'),
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    res.render('index', { title: 'SoftColors' });
+    res.render('index', { title: 'Soft Colors' });
 });
 
 router.post('/getColorNames', async function(req, res, next) {
