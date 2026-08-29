@@ -1,7 +1,6 @@
 var handlers = {
     convert: function(e) {
         e.preventDefault();
-        animateColorsOut();
 
         setTimeout(function() {
             $.get('/convert', function(form) {
@@ -28,7 +27,6 @@ var handlers = {
 
     choose: function(e) {
         e.preventDefault();
-        animateColorsOut();
 
         setTimeout(function() {
             $.get('/choose', function(colors) {
@@ -40,14 +38,12 @@ var handlers = {
     chooseColor: function(colors) {
         $.get('/chooseColor', function(colorBoxes) {
             var colorBoxes = $(colorBoxes);
-            animateColorsIn(colorBoxes, colors);
             $('.content').html(colorBoxes);
         }, 'html');
     },
 
     random: function(e) {
         e.preventDefault();
-        animateColorsOut();
 
         setTimeout(function() {
             $.get('/random', function(randomColors) {
@@ -59,40 +55,114 @@ var handlers = {
     chooseRandomColor: function(randomColors) {
         $.get('/chooseColor', function(colorBoxes) {
             var colorBoxes = $(colorBoxes);
-            animateColorsIn(colorBoxes, randomColors);
             $('.content').html(colorBoxes);
         }, 'html');
     }
 }
 
-function animateColorsOut() {
-    $.each($(".color-box"), function(i, element) {
-        $(element).css({ 'opacity': 0 });
-        setTimeout(function() {
-            $(element).css({
-                'opacity': 1.0,
-                'animation': 'fadeOut 0.65s forwards ease'
+// Watercolor-style wash: blur, desaturate, and drift away
+function washOut($els, duration, stagger, complete) {
+    duration = duration || 350;
+    stagger = stagger || 50;
+    var $visible = $els.filter(':visible');
+    var pending = $visible.length;
+
+    if (!pending) {
+        if (complete) complete();
+        return;
+    }
+
+    $visible.each(function(index) {
+        var $el = $(this);
+        $el
+            .stop(true, false)
+            .css('pointer-events', 'none')
+            .delay(index * stagger)
+            .animate({ opacity: 0 }, {
+                duration: duration,
+                easing: 'swing',
+                step: function(now) {
+                    var progress = 1 - now;
+                    $el.css({
+                        filter: 'blur(' + (progress * 5) + 'px) saturate(' + (1 - progress * 0.85) + ') brightness(' + (1 + progress * 0.45) + ')',
+                        transform: 'scale(' + (1 + progress * 0.01) + ')'
+                    });
+                },
+                complete: function() {
+                    $el.hide().css({
+                        opacity: '',
+                        filter: '',
+                        transform: '',
+                        'pointer-events': ''
+                    });
+                    pending -= 1;
+                    if (pending === 0 && complete) complete();
+                }
             });
-        }, 100 + (i * 100));
     });
 }
 
-function animateColorsIn(arr, colors) {
-    $.each(arr.find(".color-box"), function(i, element) {
-        $(element).css({ 'opacity': 0 });
-        setTimeout(function() {
-            $(element).css({
-                'opacity': 1.0,
-                'animation': 'fadeIn 0.65s forwards ease',
-                'background-color': colors[i]
+function washIn($els, duration, stagger, complete) {
+    duration = duration || 320;
+    stagger = stagger || 50;
+    var pending = $els.length;
+
+    if (!pending) {
+        if (complete) complete();
+        return;
+    }
+
+    $els.each(function(index) {
+        var $el = $(this);
+        $el
+            .stop(true, false)
+            .show()
+            .css({
+                opacity: 0,
+                filter: 'blur(5px) saturate(0.15) brightness(1.45)',
+                transform: 'scale(1.01)',
+                'pointer-events': 'none'
+            })
+            .delay(index * stagger)
+            .animate({ opacity: 1 }, {
+                duration: duration,
+                easing: 'swing',
+                step: function(now) {
+                    var progress = 1 - now;
+                    $el.css({
+                        filter: 'blur(' + (progress * 5) + 'px) saturate(' + (1 - progress * 0.85) + ') brightness(' + (1 + progress * 0.45) + ')',
+                        transform: 'scale(' + (1 + progress * 0.01) + ')'
+                    });
+                },
+                complete: function() {
+                    $el.css({
+                        opacity: '',
+                        filter: '',
+                        transform: '',
+                        'pointer-events': ''
+                    });
+                    pending -= 1;
+                    if (pending === 0 && complete) complete();
+                }
             });
-        }, 100 + (i * 100));
     });
 }
 
-function animationTiming(arr) {
-    var time = (arr.length) ? 1200 : 270;
-    return time;
+function showColorPicker() {
+    // Brush rinses first, then the palette washes away
+    washOut($('.paintbrush-image-container, .paintbrush-palette'), 350, 50, function() {
+        $('.color-picker').fadeIn(200);
+        $('.show-color-picker-button').hide();
+        $('.show-brush-and-palette-button').show();
+    });
+}
+
+function showBrushAndPalette() {
+    $('.color-picker').hide();
+    $('.show-color-picker-button').show();
+    $('.show-brush-and-palette-button').hide();
+    // Palette settles first, then brush reappears into it
+    washIn($('.paintbrush-palette, .paintbrush-image-container'), 320, 50);
 }
 
 function pPiling() {
@@ -190,6 +260,7 @@ function genericClickHandler() {
 }
 
 $(document).ready(function() {
+    showBrushAndPalette();
     pPiling();
     delegation();
     genericClickHandler();

@@ -143,23 +143,97 @@ html {
   overflow: hidden;
 }
 
-.paintbrush-palette img,
-.paintbrush,
-.palette {
+.paintbrush-palette .paintbrush {
   display: block;
-  max-width: 80%;
-  width: auto;
+  max-width: 100%;
+  width: 80%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.palette-stage {
+  position: relative;
+  display: block;
+  max-width: 70%;
+  width: 100%;
+  line-height: 0;
+}
+
+.palette-stage .palette {
+  display: block;
+  width: 100%;
   height: auto;
 }
 
-.pick-colors-button {
+/* First pan (top-left well) on the palette image */
+.pan-pigment {
+  position: absolute;
+  left: 7%;
+  top: 15.9%;
+  width: 15.6%;
+  height: 31.8%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.pigment-1 {
+  left: 7%;
+  top: 15.9%;
+}
+
+.pigment-2 {
+  left: 24.5%;
+  top: 15.9%;
+}
+
+.pigment-3 {
+  left: 42%;
+  top: 15.9%;
+}
+
+.pigment-4 {
+  left: 59.5%;
+  top: 15.9%;
+}
+
+.pigment-5 {
+  left: 77%;
+  top: 15.9%;
+}
+
+.pigment-6 {
+  left: 7%;
+  top: 52.6%;
+}
+
+.pigment-7 {
+  left: 24.5%;
+  top: 52.6%;
+}
+
+.pigment-8 {
+  left: 42%;
+  top: 52.6%;
+}
+
+.pigment-9 {
+  left: 59.5%;
+  top: 52.6%;
+}
+
+.pigment-10 {
+  left: 77%;
+  top: 52.6%;
+}
+
+.show-color-picker-button, .show-brush-and-palette-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 56px;
   height: 56px;
   padding: 0;
-  border: 2px solid #222;
+  border: 3px solid #222;
   border-radius: 50%;
   background: #fff;
   color: #111;
@@ -170,24 +244,48 @@ html {
   margin-top: 15px;
 }
 
-.pick-colors-button:hover {
+.show-color-picker-button:hover, .show-brush-and-palette-button:hover {
   transform: scale(1.05);
   background: #111;
   color: #fff;
 }
 
-.pick-colors-button:active {
+.show-color-picker-button:active, .show-brush-and-palette-button:active {
   transform: scale(0.97);
 }
 
-.pick-colors-button:focus-visible {
+.show-color-picker-button:focus-visible, .show-brush-and-palette-button:focus-visible {
   outline: 2px solid #111;
   outline-offset: 3px;
 }
 
-.dropper-icon {
+.dropper-icon,
+.brush-icon {
   display: block;
   pointer-events: none;
+}
+
+.color-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-picker-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-buttons {
+  position: absolute;
+  bottom: calc(5% + 10px);
+  left: 0;
+  right: 0;
+  text-align: center;
 }
 
 /*-------------------*        #FONTS
@@ -204,6 +302,7 @@ html {
 
 /*-------------------*     #MAINLAYOUT
 \*-------------------*/
+
 body {
   width: 100%;
   max-width: 100%;
