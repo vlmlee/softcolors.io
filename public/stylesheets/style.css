@@ -265,11 +265,15 @@ html {
   pointer-events: none;
 }
 
-.color-picker {
+.color-picker-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
+  min-width: 80%;
+  top: 60px;
+  position: relative;
 }
 
 .color-picker-row {
@@ -277,7 +281,58 @@ html {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 48px;
+  min-width: 100%;
+}
+
+.color-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 160px;
+}
+
+.color-name {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #444;
+  text-align: center;
+  filter: blur(0.3px);
+  padding: 3px 0;
+}
+
+.color-code {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  text-align: left;
+  letter-spacing: 0.1px;
+  filter: blur(0.3px);
+}
+
+.color-arrow {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: #555;
+  line-height: 20px;
+}
+
+.color-box {
+  width: 184px;
+  height: 82px;
+  border-radius: 10px;
+  background-color: #ff0000;
+}
+
+.color-box__modified {
+  width: 184px;
+  height: 82px;
+  border-radius: 10px;
+  background-color: #ff9999;
 }
 
 .action-buttons {
@@ -621,6 +676,7 @@ submit:focus {
 
 /*-------------------*      #SECTION2
 \*-------------------*/
+
 .page-2-wrapper {
   max-width: 1200px;
   width: 100%;
