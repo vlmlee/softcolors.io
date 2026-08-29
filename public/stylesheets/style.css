@@ -303,6 +303,10 @@ html {
   padding: 3px 0;
   letter-spacing: 0.3px;
   width: 184px;
+  max-width: 184px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .color-code {

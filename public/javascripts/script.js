@@ -182,7 +182,8 @@ function setDefaultColors() {
     for (var i = 0; i < defaultColors.length; i++) {
         $('.color-box').eq(i).css('background-color', defaultColors[i].hex);
         $('.color-box__modified').eq(i).css('background-color', defaultColors[i].hex);
-        $('.color-name').eq(i).text(defaultColors[i].name + ' → ' + defaultColors[i].name);
+        var colorName = defaultColors[i].name + ' → ' + defaultColors[i].name;
+        $('.color-name').eq(i).text(colorName).attr('title', colorName);
         $('.color-code').eq(i).text(defaultColors[i].hex.toUpperCase() + ' → ' + defaultColors[i].hex.toUpperCase());
     }
 
