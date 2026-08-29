@@ -181,7 +181,7 @@ function showBrushAndPalette() {
 function setDefaultColors() {
     for (var i = 0; i < defaultColors.length; i++) {
         $('.color-box').eq(i).css('background-color', defaultColors[i].hex);
-        $('.color-box__modified').eq(i).css('background-color', defaultColors[i].hex);
+        $('.color-box__modified').eq(i).css('background-color', modifyColorToPastelSoft(defaultColors[i].hex));
         var colorName = defaultColors[i].name + ' → ' + defaultColors[i].name;
         $('.color-name').eq(i).text(colorName).attr('title', colorName);
         $('.color-code').eq(i).text(defaultColors[i].hex.toUpperCase() + ' → ' + defaultColors[i].hex.toUpperCase());
@@ -192,6 +192,76 @@ function setDefaultColors() {
         queryParams["color" + (i + 1)] = defaultColors[i].hex.slice(1);
     }
     window.history.pushState({}, '', '?' + $.param(queryParams));
+}
+
+function convertHexToHSL(hex) {
+    var r = parseInt(hex.slice(1, 3), 16) / 255;
+    var g = parseInt(hex.slice(3, 5), 16) / 255;
+    var b = parseInt(hex.slice(5, 7), 16) / 255;
+    var max = Math.max(r, g, b);
+    var min = Math.min(r, g, b);
+    var l = (max + min) / 2;
+    var s = 0;
+    var h = 0;
+
+    if (max !== min) {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+        switch (max) {
+            case r:
+                h = ((g - b) / d) + (g < b ? 6 : 0);
+                break;
+            case g:
+                h = ((b - r) / d) + 2;
+                break;
+            case b:
+                h = ((r - g) / d) + 4;
+                break;
+        }
+        h /= 6;
+    }
+
+    return { h: h, s: s, l: l };
+}
+
+function convertHSLToHex(h, s, l) {
+    var r, g, b;
+
+    if (s === 0) {
+        r = g = b = l;
+    } else {
+        var hue2rgb = function(p, q, t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    function toHex(x) {
+        return ('0' + Math.round(x * 255).toString(16)).slice(-2);
+    }
+
+    return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+
+function modifyColorToPastelRich(hex) {
+    var { h, s, l } = convertHexToHSL(hex);
+    return convertHSLToHex(h, s * 0.6, l + (0.6 * (1 - l)));
+}
+
+function modifyColorToPastelSoft(hex) {
+    var { h, s, l } = convertHexToHSL(hex);
+    return convertHSLToHex(h, s * 0.4, l + (0.7 * (1 - l)));
 }
 
 function pPiling() {
