@@ -301,6 +301,8 @@ html {
   text-align: center;
   filter: blur(0.3px);
   padding: 3px 0;
+  letter-spacing: 0.3px;
+  width: 184px;
 }
 
 .color-code {

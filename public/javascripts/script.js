@@ -1,3 +1,16 @@
+var defaultColors = [
+    {'hex': '#E53935', 'name': 'Cadmium Red'},
+    {'hex': '#3f51b5', 'name': 'Ultramarine Blue'},
+    {'hex': '#8bc34a', 'name': 'Sap Green'},
+    {'hex': '#ffee58', 'name': 'Lemon Yellow'},
+    {'hex': '#e67e22', 'name': 'Burnt Sienna'},
+    {'hex': '#b71c1c', 'name': 'Alizarin Crimson'},
+    {'hex': '#01579b', 'name': 'Phthalo Blue'},
+    {'hex': '#00897b', 'name': 'Viridian'},
+    {'hex': '#ffb74d', 'name': 'Yellow Ochre'},
+    {'hex': '#37474f', 'name': 'Paynes Gray'}
+];
+
 var handlers = {
     convert: function(e) {
         e.preventDefault();
@@ -165,6 +178,21 @@ function showBrushAndPalette() {
     washIn($('.paintbrush-palette, .paintbrush-image-container'), 320, 50);
 }
 
+function setDefaultColors() {
+    for (var i = 0; i < defaultColors.length; i++) {
+        $('.color-box').eq(i).css('background-color', defaultColors[i].hex);
+        $('.color-box__modified').eq(i).css('background-color', defaultColors[i].hex);
+        $('.color-name').eq(i).text(defaultColors[i].name + ' → ' + defaultColors[i].name);
+        $('.color-code').eq(i).text(defaultColors[i].hex.toUpperCase() + ' → ' + defaultColors[i].hex.toUpperCase());
+    }
+
+    var queryParams = {};
+    for (var i = 0; i < defaultColors.length; i++) {
+        queryParams["color" + (i + 1)] = defaultColors[i].hex.slice(1);
+    }
+    window.history.pushState({}, '', '?' + $.param(queryParams));
+}
+
 function pPiling() {
     // Pagepiling -----------------------------------------------
     // More info at https: //github.com/alvarotrigo/pagePiling.js/
@@ -261,6 +289,7 @@ function genericClickHandler() {
 
 $(document).ready(function() {
     showBrushAndPalette();
+    setDefaultColors();
     pPiling();
     delegation();
     genericClickHandler();
