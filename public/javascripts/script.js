@@ -11,6 +11,8 @@ var defaultColors = [
     { 'hex': '#37474F', 'name': 'Paynes Gray' }
 ];
 
+var isShowingColorPicker = false;
+
 var finishedLoading = false;
 
 var handlers = {
@@ -117,6 +119,7 @@ function washIn($els, duration, stagger, complete) {
 }
 
 function showColorPicker() {
+    isShowingColorPicker = true;
     // Brush rinses first, then the palette washes away
     washOut($('.paintbrush-image-container, .paintbrush-palette'), 350, 50, function () {
         $('.color-picker').fadeIn(200);
@@ -126,6 +129,7 @@ function showColorPicker() {
 }
 
 function showBrushAndPalette() {
+    isShowingColorPicker = false;
     $('.color-picker').hide();
     $('.show-color-picker-button, .waterdrop-button, .three-droplets-button').show();
     $('.show-brush-and-palette-button').hide();
@@ -140,14 +144,22 @@ function setQueryParams(colors) {
     window.history.pushState({}, '', '?' + $.param(queryParams));
 }
 
-async function setColorPalette(useDefault = false) {
-    const colorsFromQueryParams = await getColorsFromQueryParams(useDefault);
+function getQueryParams() {
+    var queryParams = window.location.search.substring(1);
+    return decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",").map(color => '#' + color);
+}
 
-    for (var i = 0; i < colorsFromQueryParams.length; i++) {
-        $('#pigment-' + (i + 1) + ' stop').attr('stop-color', colorsFromQueryParams[i].hex);
+function setPanColors(colors) {
+    for (var i = 0; i < colors.length; i++) {
+        $('#pigment-' + (i + 1) + ' stop').attr('stop-color', colors[i].hex);
     }
+}
 
-    var softColors = colorsFromQueryParams.map(color => modifyColorToPastelSoft(color.hex));
+async function setColorPalette(useDefault = false, modifier = modifyColorToPastelRich) {
+    const colorsFromQueryParams = await getColorsFromQueryParams(useDefault);
+    setPanColors(colorsFromQueryParams);
+
+    var softColors = colorsFromQueryParams.map(color => modifier(color.hex));
     var colors = await handlers.getColorNames(softColors);
 
     for (var i = 0; i < colorsFromQueryParams.length; i++) {
@@ -162,14 +174,8 @@ async function setColorPalette(useDefault = false) {
 }
 
 async function getColorsFromQueryParams(useDefault) {
-    var queryParams = window.location.search.substring(1);
-
-    if (queryParams === '' || useDefault) {
-        finishedLoading = true;
-        return defaultColors;
-    }
-    var queryParamColors = decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",");
-    var colors = await handlers.getColorNames(queryParamColors.map(color => '#' + color));
+    var queryParamColors = useDefault ? defaultColors.map(color => color.hex) : getQueryParams();
+    var colors = await handlers.getColorNames(queryParamColors);
 
     finishedLoading = true;
 
@@ -182,8 +188,31 @@ async function getColorsFromQueryParams(useDefault) {
 }
 
 function resetColors() {
-    setQueryParams(defaultColors);
-    setColorPalette(true);
+    if (isShowingColorPicker) {
+        setQueryParams(defaultColors);
+        setColorPalette(true);
+    } else {
+        const colors = getQueryParams();
+        setPanColors(colors.map(color => ({ hex: color })));
+    }
+}
+
+function handleSoften() {
+    if (isShowingColorPicker) {
+        setColorPalette(false, modifyColorToPastelRich);
+    } else {
+        const colors = getQueryParams();
+        setPanColors(colors.map(color => ({ hex: modifyColorToPastelRich(color) })));
+    }
+}
+
+function handleSofter() {
+    if (isShowingColorPicker) {
+        setColorPalette(false, modifyColorToPastelSoft);
+    } else {
+        const colors = getQueryParams();
+        setPanColors(colors.map(color => ({ hex: modifyColorToPastelSoft(color) })));
+    }
 }
 
 function convertHexToHSL(hex) {
