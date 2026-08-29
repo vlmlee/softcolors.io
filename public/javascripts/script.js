@@ -115,7 +115,7 @@ function showColorPicker() {
     // Brush rinses first, then the palette washes away
     washOut($('.paintbrush-image-container, .paintbrush-palette'), 350, 50, function() {
         $('.color-picker').fadeIn(200);
-        $('.show-color-picker-button, .waterdrop-button, .three-droplets-button').hide();
+        $('.show-color-picker-button').hide();
         $('.show-brush-and-palette-button').show();
     });
 }
