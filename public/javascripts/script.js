@@ -162,7 +162,9 @@ async function setColorPalette() {
 
 async function getColorsFromQueryParams() {
     var queryParams = window.location.search.substring(1);
+
     if (queryParams === '') {
+        finishedLoading = true;
         return defaultColors;
     }
     var queryParamColors = decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",");
