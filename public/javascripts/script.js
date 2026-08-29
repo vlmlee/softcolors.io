@@ -1,14 +1,14 @@
 var defaultColors = [
     { 'hex': '#E53935', 'name': 'Cadmium Red' },
-    { 'hex': '#3f51b5', 'name': 'Ultramarine Blue' },
-    { 'hex': '#8bc34a', 'name': 'Sap Green' },
-    { 'hex': '#ffee58', 'name': 'Lemon Yellow' },
-    { 'hex': '#e67e22', 'name': 'Burnt Sienna' },
-    { 'hex': '#b71c1c', 'name': 'Alizarin Crimson' },
-    { 'hex': '#01579b', 'name': 'Phthalo Blue' },
-    { 'hex': '#00897b', 'name': 'Viridian' },
-    { 'hex': '#ffb74d', 'name': 'Yellow Ochre' },
-    { 'hex': '#37474f', 'name': 'Paynes Gray' }
+    { 'hex': '#3F51B5', 'name': 'Ultramarine Blue' },
+    { 'hex': '#8BC34A', 'name': 'Sap Green' },
+    { 'hex': '#FFEE58', 'name': 'Lemon Yellow' },
+    { 'hex': '#E67E22', 'name': 'Burnt Sienna' },
+    { 'hex': '#B71C1C', 'name': 'Alizarin Crimson' },
+    { 'hex': '#01579B', 'name': 'Phthalo Blue' },
+    { 'hex': '#00897B', 'name': 'Viridian' },
+    { 'hex': '#FFB74D', 'name': 'Yellow Ochre' },
+    { 'hex': '#37474F', 'name': 'Paynes Gray' }
 ];
 
 var finishedLoading = false;
@@ -140,8 +140,8 @@ function setQueryParams(colors) {
     window.history.pushState({}, '', '?' + $.param(queryParams));
 }
 
-async function setColorPalette() {
-    const colorsFromQueryParams = await getColorsFromQueryParams();
+async function setColorPalette(useDefault = false) {
+    const colorsFromQueryParams = await getColorsFromQueryParams(useDefault);
 
     for (var i = 0; i < colorsFromQueryParams.length; i++) {
         $('#pigment-' + (i + 1) + ' stop').attr('stop-color', colorsFromQueryParams[i].hex);
@@ -161,10 +161,10 @@ async function setColorPalette() {
     setQueryParams(colorsFromQueryParams);
 }
 
-async function getColorsFromQueryParams() {
+async function getColorsFromQueryParams(useDefault) {
     var queryParams = window.location.search.substring(1);
 
-    if (queryParams === '') {
+    if (queryParams === '' || useDefault) {
         finishedLoading = true;
         return defaultColors;
     }
@@ -175,7 +175,7 @@ async function getColorsFromQueryParams() {
 
     return colors.map(color => {
         return {
-            hex: color.hex,
+            hex: color.hex.toUpperCase(),
             name: color.name
         }
     });
@@ -183,7 +183,7 @@ async function getColorsFromQueryParams() {
 
 function resetColors() {
     setQueryParams(defaultColors);
-    setColorPalette();
+    setColorPalette(true);
 }
 
 function convertHexToHSL(hex) {
