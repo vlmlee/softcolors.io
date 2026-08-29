@@ -16,9 +16,6 @@
     &:active {
         background-color: #96c5f7;
     }
-    @media(max-width: 1200px) {
-        margin-left: -20px;
-    }
 }
 
 .button:focus {
@@ -34,9 +31,6 @@
 
 .button--size-s {
     font-size: 16px;
-    @media(max-width: 1200px) {
-        font-size: 12px;
-    }
 }
 
 .button--size-m {
