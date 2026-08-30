@@ -1,7 +1,7 @@
-# SoftColors
+# Soft Colors
 
-SoftColors is a simple app that soften colors for you. It uses the [TinyColor](https://github.com/bgrins/TinyColor) API to manipulate the input colors. 
+Soft Colors turns your palette into colorful pastels and is an experimental project by developer Michael Lee.
 
-It was created as practice with jQuery animations.
+It is a minimal, framework-less app that utilizes the [Color Name API](https://color.pizza) for specific color names.
 
-## License: MIT
+https://github.com/user-attachments/assets/68b52d02-20da-4a8b-a811-ba09c795b470
