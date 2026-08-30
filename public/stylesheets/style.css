@@ -378,8 +378,8 @@ body.is-ready {
 
 .main.is-dark .paintbrush-palette .paintbrush,
 .main.is-dark .palette-stage {
-  filter: drop-shadow(0 2px 5px #2B2330)
-    drop-shadow(0 2px 5px #2B2330);
+  filter: drop-shadow(0 3px 5px #0a0a0a)
+    drop-shadow(0 3px 5px #0a0a0a);
 }
 
 h1 {
