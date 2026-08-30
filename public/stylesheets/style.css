@@ -106,7 +106,11 @@ html {
   top: 52.6%;
 }
 
-.show-color-picker-button, .show-brush-and-palette-button, .waterdrop-button, .three-droplets-button, .reset-button {
+.show-color-picker-button,
+.show-brush-and-palette-button,
+.waterdrop-button,
+.three-droplets-button,
+.reset-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -123,18 +127,58 @@ html {
     color 0.2s ease;
 }
 
-.show-color-picker-button:hover, .show-brush-and-palette-button:hover, .waterdrop-button:hover, .three-droplets-button:hover, .reset-button:hover {
+.is-dark .show-color-picker-button,
+.is-dark .show-brush-and-palette-button,
+.is-dark .waterdrop-button,
+.is-dark .three-droplets-button,
+.is-dark .reset-button {
+  border: 2px solid #fff;
+  background: #121212;
+  color: #fff;
+}
+
+.show-color-picker-button:hover,
+.show-brush-and-palette-button:hover,
+.waterdrop-button:hover,
+.three-droplets-button:hover,
+.reset-button:hover {
   transform: scale(1.05);
   background: #111;
   color: #fff;
 }
 
-.show-color-picker-button:active, .show-brush-and-palette-button:active, .waterdrop-button:active, .three-droplets-button:active, .reset-button:active {
+.is-dark .show-color-picker-button:hover,
+.is-dark .show-brush-and-palette-button:hover,
+.is-dark .waterdrop-button:hover,
+.is-dark .three-droplets-button:hover,
+.is-dark .reset-button:hover {
+  background: #fff;
+  color: #121212;
+}
+
+.show-color-picker-button:active,
+.show-brush-and-palette-button:active,
+.waterdrop-button:active,
+.three-droplets-button:active,
+.reset-button:active {
   transform: scale(0.97);
 }
 
-.show-color-picker-button:focus-visible, .show-brush-and-palette-button:focus-visible, .waterdrop-button:focus-visible, .three-droplets-button:focus-visible, .reset-button:focus-visible {
+.show-color-picker-button:focus-visible,
+.show-brush-and-palette-button:focus-visible,
+.waterdrop-button:focus-visible,
+.three-droplets-button:focus-visible,
+.reset-button:focus-visible {
   outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
+.is-dark .show-color-picker-button:focus-visible,
+.is-dark .show-brush-and-palette-button:focus-visible,
+.is-dark .waterdrop-button:focus-visible,
+.is-dark .three-droplets-button:focus-visible,
+.is-dark .reset-button:focus-visible {
+  outline: 2px solid #fff;
   outline-offset: 3px;
 }
 
@@ -193,6 +237,14 @@ html {
   margin-bottom: -5px;
 }
 
+.section.is-dark .color-name {
+  color: rgba(255, 255, 255, 0.87) !important;
+}
+
+.section.is-dark .color-code {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
 .color-code {
   font-family: 'Source Code Pro', monospace;
   font-size: 14px;
@@ -211,7 +263,8 @@ html {
   line-height: 20px;
 }
 
-.color-box, .color-box__modified {
+.color-box,
+.color-box__modified {
   position: relative;
   width: 184px;
   height: 82px;
@@ -309,6 +362,10 @@ body {
   overflow: hidden;
 }
 
+.main.is-dark {
+  background-color: #121212 !important;
+}
+
 h1 {
   text-align: center;
   color: #444444;
@@ -324,6 +381,60 @@ a {
 
 a:hover {
   color: #21333C;
+}
+
+.dark-mode {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+}
+
+.dark-mode__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #222222;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.dark-mode__toggle:hover {
+  background: rgba(34, 34, 34, 0.08);
+}
+
+.dark-mode__icon {
+  display: block;
+  overflow: visible;
+}
+
+.dark-mode__sun,
+.dark-mode__moon {
+  transform-origin: center;
+  transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark-mode__moon {
+  opacity: 0;
+  transform: rotate(-45deg) scale(0.6);
+}
+
+.dark-mode.is-dark .dark-mode__sun {
+  opacity: 0;
+  transform: rotate(45deg) scale(0.6);
+}
+
+.dark-mode.is-dark .dark-mode__moon {
+  opacity: 1;
+  transform: rotate(0) scale(1);
+  color: #fff;
 }
 
 /*-------------------*      #SECTION2

@@ -12,7 +12,7 @@ var defaultColors = [
 ];
 
 var isShowingColorPicker = false;
-
+var isDarkMode = false;
 var finishedLoading = false;
 
 var handlers = {
@@ -381,6 +381,13 @@ function modifyColorToPastelRich(hex) {
 function modifyColorToPastelSoft(hex) {
     var { h, s, l } = convertHexToHSL(hex);
     return convertHSLToHex(h, s * 0.4, l + (0.7 * (1 - l)));
+}
+
+function setDarkMode(darkMode) {
+    isDarkMode = darkMode;
+    $('.main').toggleClass('is-dark', darkMode);
+    $('.dark-mode')
+        .toggleClass('is-dark', darkMode);
 }
 
 function pPiling() {
