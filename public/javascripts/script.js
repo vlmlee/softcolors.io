@@ -563,6 +563,7 @@ $(document).ready(function () {
             clearInterval(interval);
             $(elementsToHide.join(', ')).show();
             showBrushAndPalette();
+            $('body').addClass('is-ready');
         }
     }, 1000);
 
