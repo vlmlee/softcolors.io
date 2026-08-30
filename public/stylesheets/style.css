@@ -366,6 +366,12 @@ body {
   background-color: #121212 !important;
 }
 
+.main.is-dark .paintbrush-palette .paintbrush,
+.main.is-dark .palette-stage {
+  filter: drop-shadow(0 2px 5px #2B2330)
+    drop-shadow(0 2px 5px #2B2330);
+}
+
 h1 {
   text-align: center;
   color: #444444;
