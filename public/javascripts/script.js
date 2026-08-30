@@ -260,7 +260,7 @@ async function setColorPalette(useDefault = false, modifier = modifyColorToPaste
             );
 
             var colorName = colors[index].name !== 'Unnamed Color (API Unavailable)' ? colorsFromQueryParams[index].name + ' → ' + colors[index].name : "Name Unavailable";
-            $('.color-name').eq(index).text(colorName).attr('title', colorName);
+            $('.color-name').eq(index).text(colorName).attr('title', colorName).css('color', colors[index].name === 'Unnamed Color (API Unavailable)' ? '#888' : '#444');
 
             $('.color-code').eq(index).text(
                 colorsFromQueryParams[index].hex.toUpperCase() + ' → ' + colors[index].hex.toUpperCase()
