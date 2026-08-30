@@ -149,9 +149,83 @@ function getQueryParams() {
     return decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",").map(color => '#' + color);
 }
 
-function setPanColors(colors) {
+var colorAnimations = {};
+
+function hexToRgb(hex) {
+    if (!hex || hex.charAt(0) !== '#' || hex.length < 7) return null;
+    return {
+        r: parseInt(hex.slice(1, 3), 16),
+        g: parseInt(hex.slice(3, 5), 16),
+        b: parseInt(hex.slice(5, 7), 16)
+    };
+}
+
+function rgbToHex(r, g, b) {
+    function toHex(x) {
+        return ('0' + Math.round(x).toString(16)).slice(-2);
+    }
+    return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+
+function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+}
+
+function animateToColor(key, fromHex, toHex, apply, options) {
+    options = options || {};
+    var duration = options.duration != null ? options.duration : 520;
+    var animate = options.animate !== false;
+    var from = hexToRgb(fromHex);
+    var to = hexToRgb(toHex);
+
+    if (colorAnimations[key]) {
+        cancelAnimationFrame(colorAnimations[key]);
+        colorAnimations[key] = null;
+    }
+
+    // First paint or missing colors — set immediately
+    if (!animate || !from || !to || fromHex.toUpperCase() === toHex.toUpperCase()) {
+        apply(toHex);
+        return;
+    }
+
+    var startTime = null;
+
+    function frame(now) {
+        if (startTime === null) startTime = now;
+        var t = Math.min(1, (now - startTime) / duration);
+        var eased = easeOutCubic(t);
+        apply(rgbToHex(
+            from.r + (to.r - from.r) * eased,
+            from.g + (to.g - from.g) * eased,
+            from.b + (to.b - from.b) * eased
+        ));
+
+        if (t < 1) {
+            colorAnimations[key] = requestAnimationFrame(frame);
+        } else {
+            colorAnimations[key] = null;
+        }
+    }
+
+    colorAnimations[key] = requestAnimationFrame(frame);
+}
+
+function setPanColors(colors, options) {
     for (var i = 0; i < colors.length; i++) {
-        $('#pigment-' + (i + 1) + ' stop').attr('stop-color', colors[i].hex);
+        (function (index) {
+            var targetHex = colors[index].hex;
+            var $stops = $('#pigment-' + (index + 1) + ' stop');
+            animateToColor(
+                'pan-' + index,
+                $stops.first().attr('stop-color'),
+                targetHex,
+                function (hex) {
+                    $stops.attr('stop-color', hex);
+                },
+                options
+            );
+        })(i);
     }
 }
 
@@ -161,11 +235,33 @@ async function setColorPalette(useDefault = false, modifier = modifyColorToPaste
     var colors = await handlers.getColorNames(softColors);
 
     for (var i = 0; i < colorsFromQueryParams.length; i++) {
-        $('.color-box').eq(i).css('background-color', colorsFromQueryParams[i].hex);
-        $('.color-box__modified').eq(i).css('background-color', colors[i].hex);
-        var colorName = colorsFromQueryParams[i].name + ' → ' + colors[i].name;
-        $('.color-name').eq(i).text(colorName).attr('title', colorName);
-        $('.color-code').eq(i).text(colorsFromQueryParams[i].hex.toUpperCase() + ' → ' + colors[i].hex.toUpperCase());
+        (function (index) {
+            var $box = $('.color-box').eq(index);
+            var $modified = $('.color-box__modified').eq(index);
+
+            animateToColor(
+                'box-' + index,
+                $box.css('background-color'),
+                colorsFromQueryParams[index].hex,
+                function (hex) {
+                    $box.css('background-color', hex);
+                }
+            );
+            animateToColor(
+                'box-modified-' + index,
+                $modified.css('background-color'),
+                colors[index].hex,
+                function (hex) {
+                    $modified.css('background-color', hex);
+                }
+            );
+
+            var colorName = colorsFromQueryParams[index].name + ' → ' + colors[index].name;
+            $('.color-name').eq(index).text(colorName).attr('title', colorName);
+            $('.color-code').eq(index).text(
+                colorsFromQueryParams[index].hex.toUpperCase() + ' → ' + colors[index].hex.toUpperCase()
+            );
+        })(i);
     }
 
     setQueryParams(colorsFromQueryParams);
@@ -307,10 +403,12 @@ $.cssHooks.backgroundColor = {
         else if (window.getComputedStyle)
             var bg = document.defaultView.getComputedStyle(elem,
                 null).getPropertyValue("background-color");
-        if (bg.search("rgb") == -1)
+        if (!bg || bg.search("rgb") == -1)
             return bg;
         else {
-            bg = bg.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            bg = bg.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/);
+            if (!bg) return null;
+            if (bg[4] !== undefined && parseFloat(bg[4]) === 0) return null;
 
             function hex(x) {
                 return ("0" + parseInt(x).toString(16)).slice(-2);
