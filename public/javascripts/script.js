@@ -245,7 +245,8 @@ async function setColorPalette(useDefault = false, modifier = modifyColorToPaste
                 colorsFromQueryParams[index].hex,
                 function (hex) {
                     $box.css('background-color', hex);
-                }
+                },
+                { duration: 250 }
             );
             animateToColor(
                 'box-modified-' + index,
@@ -253,7 +254,8 @@ async function setColorPalette(useDefault = false, modifier = modifyColorToPaste
                 colors[index].hex,
                 function (hex) {
                     $modified.css('background-color', hex);
-                }
+                },
+                { duration: 250 }
             );
 
             var colorName = colorsFromQueryParams[index].name + ' → ' + colors[index].name;
@@ -474,6 +476,79 @@ function genericClickHandler() {
         }
     });
 }
+
+function closeColorBoxPopup() {
+    $('.color-box-popup').remove();
+}
+
+function normalizeHex(value) {
+    if (!value) return null;
+    var hex = value.trim().toUpperCase();
+    if (hex.charAt(0) !== '#') hex = '#' + hex;
+    if (!/^#[0-9A-F]{6}$/.test(hex)) return null;
+    return hex;
+}
+
+function applyColorFromPopup($box, $popup) {
+    var newColor = normalizeHex($popup.find('input').val());
+    if (!newColor) return;
+
+    var index = $('.color-box').index($box);
+    var colors = getQueryParams().map(function (hex, i) {
+        return { hex: i === index ? newColor : hex };
+    });
+
+    setQueryParams(colors);
+    closeColorBoxPopup();
+    setColorPalette(false, modifyColorToPastelRich);
+    setPanColors(colors);
+}
+
+function openColorBoxPopup($box) {
+    closeColorBoxPopup();
+
+    var currentColor = ($box.css('background-color') || '').toUpperCase();
+    var $popup = $(
+        '<div class="color-box-popup">' +
+            '<input type="text" maxlength="7" spellcheck="false" />' +
+            '<button type="button">OK</button>' +
+        '</div>'
+    );
+
+    $popup.find('input').val(currentColor);
+    $box.append($popup);
+    $popup.find('input').focus().select();
+
+    $popup.on('click', function (e) {
+        e.stopPropagation();
+    });
+
+    $popup.find('button').on('click', function (e) {
+        e.stopPropagation();
+        applyColorFromPopup($box, $popup);
+    });
+
+    $popup.find('input').on('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyColorFromPopup($box, $popup);
+        }
+    });
+}
+
+$(document).on('click', '.color-box', function (e) {
+    e.stopPropagation();
+    var $box = $(this);
+    if ($box.find('.color-box-popup').length) {
+        closeColorBoxPopup();
+        return;
+    }
+    openColorBoxPopup($box);
+});
+
+$(document).on('click', function () {
+    closeColorBoxPopup();
+});
 
 $(document).ready(function () {
     setColorPalette();
