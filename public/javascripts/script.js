@@ -157,8 +157,6 @@ function setPanColors(colors) {
 
 async function setColorPalette(useDefault = false, modifier = modifyColorToPastelRich) {
     const colorsFromQueryParams = await getColorsFromQueryParams(useDefault);
-    setPanColors(colorsFromQueryParams);
-
     var softColors = colorsFromQueryParams.map(color => modifier(color.hex));
     var colors = await handlers.getColorNames(softColors);
 
@@ -381,6 +379,7 @@ function genericClickHandler() {
 
 $(document).ready(function () {
     setColorPalette();
+    resetColors();
     const elementsToHide = [
         '.color-picker',
         '.show-color-picker-button',
