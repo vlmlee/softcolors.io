@@ -227,7 +227,7 @@ html {
   height: 20px;
   color: #444;
   text-align: left;
-  filter: blur(0.3px);
+  filter: blur(0.1px);
   letter-spacing: 0.3px;
   width: 184px;
   max-width: 184px;
@@ -252,7 +252,7 @@ html {
   color: #555;
   text-align: left;
   letter-spacing: 0.1px;
-  filter: blur(0.3px);
+  filter: blur(0.1px);
 }
 
 .color-arrow {
