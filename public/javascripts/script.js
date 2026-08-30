@@ -146,7 +146,7 @@ function setQueryParams(colors) {
 
 function getQueryParams() {
     var queryParams = window.location.search.substring(1);
-    var hexes = decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",").map(color => '#' + color);
+    var hexes = queryParams ? decodeURIComponent(new URLSearchParams(queryParams).get('colors')).split(",").map(color => '#' + color) : [];
     return hexes.length < 10 ? [...hexes, ...defaultColors.slice(hexes.length).map(color => color.hex)] : hexes;
 }
 
