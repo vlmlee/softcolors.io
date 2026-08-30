@@ -522,15 +522,8 @@
                     case 35:
                         PP.moveTo($('.pp-section').length);
                         break;
-
-                        //left
                     case 37:
-                        PP.moveSectionUp();
-                        break;
-
-                        //right
                     case 39:
-                        PP.moveSectionDown();
                         break;
 
                     default:

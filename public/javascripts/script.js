@@ -461,22 +461,6 @@ function delegation() {
     //-----------------------------------------------------------
 }
 
-function genericClickHandler() {
-    // In order to follow the DRY principle, we create a generic 
-    // click handler for all buttons and links using the data-action 
-    // attribute. Here, we map the data-action attribute's value to 
-    // its respective handler function.
-    $("button[data-action]").on("click", function (e) {
-        e.preventDefault();
-        var link = $(this),
-            action = link.data("action");
-
-        if (typeof handlers[action] === "function") {
-            handlers[action].call(this, e);
-        }
-    });
-}
-
 function closeColorBoxPopup() {
     $('.color-box-popup').remove();
 }
@@ -575,5 +559,4 @@ $(document).ready(function () {
 
     pPiling();
     delegation();
-    genericClickHandler();
 });
