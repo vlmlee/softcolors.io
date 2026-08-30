@@ -297,6 +297,34 @@ submit {
                 color: #21333C;
             }
         }
+        .made-in-chicago {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45em;
+            font-size: 0.85em;
+            color: #ccc;
+            opacity: 0.85;
+        }
+        .chicago-flag {
+            display: inline-block;
+            background: #fff;
+            padding: 0.28em 0;
+            line-height: 1;
+            vertical-align: middle;
+            opacity: 1;
+        }
+        .chicago-flag__stars {
+            display: block;
+            box-sizing: border-box;
+            border-top: 0.28em solid #41b6e6;
+            border-bottom: 0.28em solid #41b6e6;
+            padding: 0.08em 0.32em;
+            color: #e4002b;
+            font-size: 0.7em;
+            letter-spacing: 0.08em;
+            line-height: 1;
+            opacity: 1;
+        }
     }
 }
 
