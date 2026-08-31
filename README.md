@@ -1,6 +1,6 @@
 # Soft Colors
 
-Soft Colors turns your palette into colorful pastels.
+Soft Colors turns your color palette into soft pastels.
 
 It is a minimal, framework-less app that utilizes the [Color Name API](https://color.pizza) for specific color names.
 
